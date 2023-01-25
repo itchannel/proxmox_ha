@@ -1,4 +1,4 @@
-DOMAIN = "proxmoxve2"
+DOMAIN = "proxmoxve"
 SERVERIP = "serverip"
 SERVERPORT = "serverport"
 REALM = "realm"
