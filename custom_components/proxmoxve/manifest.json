@@ -1,0 +1,12 @@
+{
+    "domain": "proxmoxve2",
+    "name": "Proxmox VE",
+    "config_flow": true,
+    "version": "0.0.1",
+    "documentation": "https://github.com/itchannel/proxmox_ha",
+    "issue_tracker": "https://github.com/itchannel/proxmox_ha/issues",
+    "codeowners": ["@itchannel"],
+    "requirements": ["proxmoxer==2.0.1"],
+    "iot_class": "local_polling",
+    "loggers": ["proxmoxer"]
+  }

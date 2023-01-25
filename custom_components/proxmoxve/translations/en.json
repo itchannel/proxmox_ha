@@ -1,0 +1,36 @@
+{
+    "config": {
+      "step": {
+        "user": {
+          "data": {
+            "serverip": "Proxmox Server IP",
+            "serverport": "Proxmox Server Port",
+            "realm": "Realm (pve, pam or other)",
+            "username": "username",
+            "password": "password",
+            "ssl_cert": "Allow untrusted certificates"
+          }
+        }
+      },
+      "error": {
+        "cannot_connect": "Unable to connect to Proxmox Server",
+        "invalid_auth": "Unable to authenticate with credentials",
+        "untrusted_cert": "Certificate validation failed (Maybe allow untrusted?)",
+        "unknown": "[%key:common::config_flow::error::unknown%]"
+      },
+      "abort": {
+        "already_configured": "[%key:common::config_flow::abort::already_configured_account%]"
+      }
+    },
+    "options": {
+      "step": {
+          "init": {
+              "data": {
+                  "update_interval": "Interval to poll Server (Seconds)"
+              },
+              "description": "Configure Server Options"
+          }
+      }
+  }
+  }
+    

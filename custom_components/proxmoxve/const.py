@@ -1,0 +1,5 @@
+DOMAIN = "proxmoxve2"
+SERVERIP = "serverip"
+SERVERPORT = "serverport"
+REALM = "realm"
+SSL_CERT = "ssl_cert"
