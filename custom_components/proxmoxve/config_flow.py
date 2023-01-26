@@ -15,7 +15,9 @@ from .const import (
     SERVERIP,
     SERVERPORT,
     REALM,
-    SSL_CERT
+    SSL_CERT,
+    UPDATE_INTERVAL,
+    UPDATE_INTERVAL_DEFAULT
 )
 DATA_SCHEMA = vol.Schema(
     {
@@ -82,6 +84,31 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="user", data_schema=DATA_SCHEMA, errors=errors
         )
+        
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry):
+        """Get the options flow for this handler."""
+        return OptionsFlow(config_entry)
+        
+class OptionsFlow(config_entries.OptionsFlow):
+    def __init__(self, config_entry: config_entries.ConfigEntry):
+        """Initialize options flow."""
+        self.config_entry = config_entry
+
+    async def async_step_init(self, user_input=None):
+        if user_input is not None:
+            return self.async_create_entry(title="", data=user_input)
+        options = {
+            vol.Optional(
+                UPDATE_INTERVAL,
+                default=self.config_entry.options.get(
+                    UPDATE_INTERVAL, UPDATE_INTERVAL_DEFAULT
+                ),
+            ): int,
+        }
+
+        return self.async_show_form(step_id="init", data_schema=vol.Schema(options))
 
 class CannotConnect(exceptions.HomeAssistantError):
     """Error to indicate we cannot connect."""
