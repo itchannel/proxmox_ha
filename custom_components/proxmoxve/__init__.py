@@ -106,12 +106,9 @@ class ProxmoxDataUpdateCoordinator(DataUpdateCoordinator):
         self.serverport = serverport
         self.username = username
         self.password = password
-        if verify_ssl is True:
-            self._verify_ssl = False
-        else:
-            self._verify_ssl = True
+        self.verify_ssl = verify_ssl
         self.realm = realm
-        self.proxmox_client = ProxmoxClient(self.serverip, self.serverport, self.username, self.realm, self.password, self._verify_ssl)
+        self.proxmox_client = ProxmoxClient(self.serverip, self.serverport, self.username, self.realm, self.password, self.verify_ssl)
         
         super().__init__(
             hass,

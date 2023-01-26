@@ -1,3 +1,6 @@
+from proxmoxer import ProxmoxAPI
+from proxmoxer.backends.https import AuthenticationError
+from proxmoxer.core import ResourceException
 class ProxmoxClient:
     """A wrapper for the proxmoxer ProxmoxAPI client."""
 
@@ -9,7 +12,10 @@ class ProxmoxClient:
         self._user = user
         self._realm = realm
         self._password = password
-        self._verify_ssl = verify_ssl
+        if verify_ssl == True:
+            self._verify_ssl = False
+        else:
+            self._verify_ssl = True
 
         self._proxmox = None
         self._connection_start_time = None
