@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from datetime import timedelta
 import logging
+import asyncio
 import async_timeout
 from proxmoxer import ProxmoxAPI
 from proxmoxer.backends.https import AuthenticationError
