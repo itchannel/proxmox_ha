@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from datetime import timedelta
 import logging
+import asyncio
 import async_timeout
 from proxmoxer import ProxmoxAPI
 from proxmoxer.backends.https import AuthenticationError
@@ -11,6 +12,7 @@ from .proxmox import ProxmoxClient
 import requests.exceptions
 from requests.exceptions import ConnectTimeout, SSLError
 from homeassistant.exceptions import ConfigEntryNotReady, HomeAssistantError
+from homeassistant.config_entries import ConfigEntry
 import voluptuous as vol
 
 from .const import (
@@ -18,7 +20,10 @@ from .const import (
     SERVERIP,
     SERVERPORT,
     REALM,
-    SSL_CERT
+    SSL_CERT,
+    COORDINATOR,
+    UPDATE_INTERVAL,
+    UPDATE_INTERVAL_DEFAULT
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
@@ -29,22 +34,7 @@ from homeassistant.helpers.update_coordinator import (
 )
 
 PLATFORMS = ["sensor"]
-PROXMOX_CLIENTS = "proxmox_clients"
-CONF_REALM = "realm"
-CONF_NODE = "node"
-CONF_NODES = "nodes"
-CONF_VMS = "vms"
-CONF_CONTAINERS = "containers"
 
-COORDINATORS = "coordinators"
-API_DATA = "api_data"
-
-DEFAULT_PORT = 8006
-DEFAULT_REALM = "pam"
-DEFAULT_VERIFY_SSL = True
-TYPE_VM = 0
-TYPE_CONTAINER = 1
-UPDATE_INTERVAL = 60
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -63,16 +53,25 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     serverport= entry.data[SERVERPORT]
     realm = entry.data[REALM]
     ssl_cert = entry.data[SSL_CERT]
+    
+    if UPDATE_INTERVAL in entry.options:
+        update_interval = entry.options[UPDATE_INTERVAL]
+    else:
+        update_interval = UPDATE_INTERVAL_DEFAULT
 
-    coordinator = ProxmoxDataUpdateCoordinator(hass, serverip, serverport, username, password, realm, ssl_cert)
+    coordinator = ProxmoxDataUpdateCoordinator(hass, serverip, serverport, username, password, realm, ssl_cert, update_interval)
 
     await coordinator.async_refresh()
+    proxmox_options_listener = entry.add_update_listener(options_update_listener)
 
     if not coordinator.last_update_success:
         raise ConfigEntryNotReady
 
     
-    hass.data[DOMAIN][entry.entry_id] = coordinator
+    hass.data[DOMAIN][entry.entry_id] = {
+        COORDINATOR : coordinator,
+        "proxmox_options_listener": proxmox_options_listener
+    }
 
     for component in PLATFORMS:
         hass.async_create_task(
@@ -91,16 +90,22 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
             ]
         )
     )
+    hass.data[DOMAIN][entry.entry_id]["proxmox_options_listener"]()
     if unload_ok:
         hass.data[DOMAIN].pop(entry.entry_id)
 
     return unload_ok
 
+async def options_update_listener(
+    hass: HomeAssistant,  entry: ConfigEntry 
+    ):
+        _LOGGER.debug("OPTIONS CHANGE")
+        await hass.config_entries.async_reload(entry.entry_id)
 
 class ProxmoxDataUpdateCoordinator(DataUpdateCoordinator):
     """DataUpdateCoordinator to handle fetching new data about the Proxmox Server."""
 
-    def __init__(self, hass, serverip, serverport, username, password, realm, verify_ssl):
+    def __init__(self, hass, serverip, serverport, username, password, realm, verify_ssl, update_interval):
         self._hass = hass
         self.serverip = serverip
         self.serverport = serverport
@@ -114,7 +119,7 @@ class ProxmoxDataUpdateCoordinator(DataUpdateCoordinator):
             hass,
             _LOGGER,
             name=DOMAIN,
-            update_interval=timedelta(seconds=60),
+            update_interval=timedelta(seconds=update_interval),
         )
 
     async def _async_update_data(self):

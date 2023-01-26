@@ -8,12 +8,12 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .const import DOMAIN
+from .const import DOMAIN, COORDINATOR
 
 _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
-    entry = hass.data[DOMAIN][config_entry.entry_id]
+    entry = hass.data[DOMAIN][config_entry.entry_id][COORDINATOR]
     sensors = []
     for node in entry.data["nodes"]:
         sensors.append(ProxmoxSensor(entry, node, config_entry.options, "node"))
