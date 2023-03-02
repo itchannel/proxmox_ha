@@ -5,17 +5,17 @@ on:
   schedule:
     - cron: '0 0 * * *'
 jobs:
-  hacs:
-    runs-on: "ubuntu-latest"
-    name: HACS
-    steps:
-      - name: Check out the repository
-        uses: "actions/checkout@v3"
-
-      - name: HACS validation
-        uses: "hacs/action@22.5.0"
-        with:
-          category: "integration"
+  #hacs:
+  #  runs-on: "ubuntu-latest"
+  #  name: HACS
+  #  steps:
+  #    - name: Check out the repository
+  #      uses: "actions/checkout@v3"
+  #
+  #    - name: HACS validation
+  #      uses: "hacs/action@22.5.0"
+  #      with:
+  #        category: "integration"
 
   hassfest:
     runs-on: "ubuntu-latest"
