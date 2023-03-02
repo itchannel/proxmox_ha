@@ -1,12 +1,12 @@
 {
     "domain": "proxmoxve",
     "name": "Proxmox VE",
-    "config_flow": true,
-    "version": "0.0.1",
-    "documentation": "https://github.com/itchannel/proxmox_ha",
-    "issue_tracker": "https://github.com/itchannel/proxmox_ha/issues",
     "codeowners": ["@itchannel"],
-    "requirements": ["proxmoxer==2.0.1"],
+    "config_flow": true,
+    "documentation": "https://github.com/itchannel/proxmox_ha",
     "iot_class": "local_polling",
-    "loggers": ["proxmoxer"]
+    "issue_tracker": "https://github.com/itchannel/proxmox_ha/issues",
+    "loggers": ["proxmoxer"],
+    "requirements": ["proxmoxer==2.0.1"],
+    "version": "0.0.1"
   }
